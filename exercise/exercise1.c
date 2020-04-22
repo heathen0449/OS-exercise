@@ -27,34 +27,45 @@ int  find (char *a_point){
 
 void show(char*a,char *b,char*c){
     int z,flag_a,flag_b,flag_c;
-    if(a[0]==' ')
+    if(a[0]==' '){
         printf("就绪队列为空\n");
         flag_a=1;
-    if(b[0]==' ')
+    }
+    if(b[0]==' '){
         printf("执行队列为空\n");
         flag_b=1;
-    if(c[0]==' ')
+    }
+    if(c[0]==' '){
         printf("阻塞队列为空\n");
         flag_c=1;
-    printf("就绪队列内容为:");
+    }
+    if(flag_a!=1){
+        printf("就绪队列内容为:");
+        for (z=find(a);z>=0;z--){
+            if (a[z]>='A' && a[z]<='O' )
+                printf("%c ",a[z]);
+        }
+    }
 
-    for (z=find(a);z>=0;z--){
-        if (a[z]>='A' && a[z]<='O' )
-            printf("%c ",a[z]);
+    if(flag_b!=1){
+        printf("\n");
+        printf("执行队列内容为:");
+        for (z=find(b);z>=0;z--){
+            if (b[z]>='A' && b[z]<='O' ) 
+                printf("%c ",b[z]);
+        }
     }
-    printf("\n");
-    printf("执行队列内容为:");
-    for (z=find(b);z>=0;z--){
-        if (b[z]>='A' && b[z]<='O' ) 
-            printf("%c ",b[z]);
+
+    if(flag_c!=1){
+        printf("\n");
+        printf("阻塞队列内容为：");
+        for (z=find(c);z>=0;z--){
+            if (c[z]>='A' && c[z]<='O' )
+                printf("%c ",c[z]);
+        }
+        printf("\n");
     }
-    printf("\n");
-    printf("阻塞队列内容为：");
-    for (z=find(c);z>=0;z--){
-        if (c[z]>='A' && c[z]<='O' )
-            printf("%c ",c[z]);
-    }
-    printf("\n");
+   
 }
 
 void init(char *a, char *b, char *c){
@@ -63,7 +74,6 @@ void init(char *a, char *b, char *c){
     int state[15];
     int number1;
     char story;
-    int count;
     for (num =0;num<15;num++){
         a[num]=b[num]=c[num]=' ';
     }
@@ -76,12 +86,7 @@ void init(char *a, char *b, char *c){
     for (number1=0;number1<3;number1++){
         story=getchar();
         while(story!='\n'){
-            //count=0;
             if (story<= 'Z'&& story>= 'A' && state[story-'A']==0 ){
-                //count++;
-                //if(count>14)
-                    //printf("数量越界，重新输入\n");
-                    //break;
                 state[story-'A']=1;
                 switch (number1){
                     case 0:
