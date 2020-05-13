@@ -6,6 +6,8 @@ start_queue = []
 ready_suspend = []
 blocked_suspend = []
 
+name_list = [ready_queue,run_queue,blocked_queue,start_queue,exit_queue,ready_suspend,blocked_suspend]
+
 memory_capactiy = 100 
 
 class PCB:
@@ -15,11 +17,13 @@ class PCB:
     status = 'new'
     priority = ' '
 
-    def __init__(self,name,size,status,priority):
+    def __init__ (self,name,size,priority,status='new'):
+        global start_queue
         self.pid = name
         self.capacity = size
         self.status =  status
         self.priority = priority
+        start_queue.append(self)
     
     def show(self):
         print(self.pid,' ',self.capacity,' ',self.status,' ',self.priority)
@@ -122,14 +126,17 @@ def event_occur(lista,listb,listc):
 
 def create_process(lista,listb,listc,listd,liste,listf,listg):
     global memory_capactiy
-    if len(listd):
+    if len(listd)==0:
         raise Exception("无准备态进程，操作非法")
-    elif memory_capactiy<lista[0].capacity:
+    elif len(lista)>0 and memory_capactiy<lista[0].capacity:
         new_to_rs(lista,listb,listc,listd,liste,listf,listg)
+        return
+    listd[0].show()
     process =  listd[0]
     process.status = 'ready'
     listd.pop(0)
     lista.append(process)
+    memory_capactiy = memory_capactiy - process.capacity
     if len(listb)==0:
         dispatch(lista,listb)
 
@@ -193,14 +200,64 @@ def new_to_rs(lista,listb,listc,listd,liste,listf,listg):
     if len(lista)==0 or (listf[0].priority =='high' and lista[0].priority=='low'):
         rs_to_r(lista,listb,listc,listf,listg)
 
+def error(choice):
+    while choice.isdigit()==False  or int(choice)>13 or int(choice)<0:
+        print("输入非法，请重新选择：")
+        choice = input ("您的选择是：")
+    return int(choice)
+
 def system():
-    print('2--超时、3--运行态的进程事件等待、4--阻塞态进程事件发生',end =' ')
-    print('s')
-    # option = input("请输入您想要的操作：")
-           
+    print('系统目前状态：')
+    print('--------------------------系统操作-------------------')
+    print('0--进程创建态到就绪态 1-- 进程就绪态到运行态（一般为自动）2--超时、3--运行态的进程事件等待、4--阻塞态进程事件发生')
+    print('5--结束进程、6--进程由创建态到就绪挂起态， 7--运行态到就绪挂起态 8--阻塞挂起态到就序挂起态')
+    print('9--阻塞到阻塞挂起态 10--阻塞挂起态到阻塞态 11--就绪挂起态到就绪态 12--就绪态到就绪挂起态 13--结束系统')
+    choice = input ("您的选择是：")
+    option = error(choice)
+    while option !=13:
+        if option==0:
+          create_process(ready_queue,run_queue,blocked_queue,\
+              start_queue,exit_queue,ready_suspend,blocked_suspend)
+        elif option==1:
+            dispatch(ready_queue,run_queue)
+        elif option==2:
+            time_out(ready_queue,run_queue) 
+        elif option==3:
+            event_wait(ready_queue,run_queue,blocked_queue)
+        elif option==4:
+            event_occur(ready_queue,run_queue,blocked_queue)
+        elif option==5:
+            release (ready_queue,run_queue,exit_queue)
+        elif option==6:
+            new_to_rs (ready_queue,run_queue,blocked_queue,\
+              start_queue,exit_queue,ready_suspend,blocked_suspend)
+        elif option==7:
+            run_to_rs(ready_queue,run_queue,ready_suspend)
+        elif option==8:
+            bs_to_rs(ready_queue,run_queue,ready_suspend,blocked_suspend)
+        elif option==9:
+            b_to_bs(ready_queue,blocked_queue,blocked_suspend,sign=1)
+        elif option==10:
+            bs_to_b(blocked_queue,blocked_suspend)
+        elif option==11:
+            rs_to_r(ready_queue,run_queue,blocked_queue,ready_suspend,blocked_suspend)
+        elif option==12:
+            r_to_rs(ready_queue,blocked_queue,ready_suspend)
+        show_all()
+        choice = input ("您的选择是：")
+        option = error(choice)
+    print("感谢您的使用")
+    quit()    
+
+
 
 
 if __name__ == "__main__":
+    A = PCB(name='A',size=10,priority='high')
+    B = PCB(name='B',size=20,priority='low')
+    C = PCB(name='C',size=30,priority='high')
+    D = PCB(name='D',size=40,priority='low')
+    E = PCB(name='E',size=50,priority='low')
     system()
     # world = []
     # for i in range(0,15):
